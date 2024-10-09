@@ -18,6 +18,14 @@ test_y = to_categorical(test_y)
 num_classes = test_y.shape[1]
 
 
+class Mycallback(tf.keras.callbacks.Callback):
+
+    def on_epoch_end(self,epoch,logs={}):
+        if (logs.get('loss')<0.4):
+            print("loss is getting lower so....")
+            self.model.stop_training = True
+
+
 def network():
 
     model = Sequential(
@@ -30,8 +38,9 @@ def network():
     )
     return model
 
+callbacks = Mycallback()
 model = network()
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
-model.fit(x=train_x,y=train_y,validation_data=(test_x,test_y),epochs=20)
+model.fit(x=train_x,y=train_y,validation_data=(test_x,test_y),epochs=20,callbacks=[callbacks])
